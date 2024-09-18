@@ -11,11 +11,8 @@ body{
     background-color: black;
 }
 
-header{
-
-}
-
 .logo{
+
     background: linear-gradient(to bottom, blue 50%, red 50%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
