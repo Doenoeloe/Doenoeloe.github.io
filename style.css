@@ -3,10 +3,9 @@
     src: url(SuperFunky-lgmWw.ttf);
 }
 
-
-
 body{
     background-color: black;
     font-family: SuperFunky;
+    font-size: x-large;
 }
 
