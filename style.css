@@ -1,22 +1,12 @@
 @font-face{
-    font-family: 'SuperFunky';
-    src: url('/SuperFunky-lgmWw.ttf');
+    font-family: SuperFunky;
+    src: url(SuperFunky-lgmWw.ttf);
 }
 
-* {
-    font-family: "SuperFunky";
-}
+
 
 body{
     background-color: black;
+    font-family: SuperFunky;
 }
 
-.logo{
-    font-size: 60px;
-    background: linear-gradient(to bottom, blue 50%, red 50%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  color: transparent;
-  font-weight: 800;
-}
