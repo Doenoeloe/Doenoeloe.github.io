@@ -6,6 +6,32 @@
 body{
     font-family: SuperFunky;
     background-color: black;
-    font-size: x-large;
+    font-size: large;
 }
 
+a:visited, a:link{
+    color: orange;
+    text-decoration: none;
+}
+
+.logo{
+    font-size: 60px;
+    font-weight: bold;
+    background: linear-gradient(to bottom, rgb(221,161,94) 50%, rgb(237, 123, 1) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+}
+
+.header{
+    position: fixed;
+    width: 100;
+    padding: 4rem 15%;
+    background-color: black;
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+}
