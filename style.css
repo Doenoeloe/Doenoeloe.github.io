@@ -2,6 +2,13 @@
     font-family: Satoshi;
     src: url("/Fonts/Satoshi-Variable.ttf");
 }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    text-decoration: none;
+    scroll-behavior: smooth;
+}
 html{
 font-size: 60%;
 overflow-x: hidden;
@@ -13,12 +20,12 @@ body{
 }
 .header{
     position: fixed;
-    width: 100;
+    width: 100%;
     top: 0;
     left: 0;
     padding: 4rem 15%;
     background-color: #1b1b23;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(100px);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -43,7 +50,156 @@ body{
 span{
     background: linear-gradient(
     270deg,
-    #FF8F85,
-    #FFA69E
+    #ff8a8a,
+    #ffa1a1
     );
+    background-clip: text;
+    color: transparent;
+}
+.navbar a{
+    font-size: 1.8rem;
+    color: aliceblue;
+    margin-left: 4rem;
+    font-weight: 500;
+    transition: 0.3s ease-in-out;
+    border-bottom: 3px solid transparent;
+}
+
+.navbar a:hover{
+    color: #ff8a8a;
+    border-bottom: 3px solid #ff8a8a;
+}
+
+section{
+    min-height: 90vh;
+    padding: 10rem 15%;
+}
+.home{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15rem;
+}
+.home-content{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+}
+.home-content h1{
+    font-size: 8rem;
+    font-weight: 700;
+    margin-top: 1.5rem;
+    line-height: 1;
+}
+.home-content h3{
+    margin: 1rem 0;
+    font-size: 4rem;
+}
+.home-content p{
+    font-size: 2rem;
+    font-weight: 5000;
+    line-height: 1.8;
+}
+.social-icons a{
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3rem;
+    padding: 1rem;
+    background-color: transparent;
+    border: 2px solid #ff8a8a;
+    border-radius: 50%;
+    color: #ff8a8a;
+    margin: 3rem 0.5rem;
+    transition: 0.3 ease-in-out;
+}
+
+.social-icons a:hover{
+    color: aliceblue;
+    background-color: #ff8a8a;
+    transform: scale(1.2)translateY(-5px);
+    box-shadow: 0 0 25px #ff8a8a;
+}
+.about{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10rem;
+    background-color: #1b1b23;
+}
+
+.about-content h2{
+    font-size: 7rem;
+    text-align: center;
+}
+.about-content p{
+    font-size: 2rem;
+    text-align: left;
+    margin: 3rem 0.5rem;
+}
+.heading{
+    text-align: center;
+    font-size: 7rem;
+    margin: 5rem 0;
+}
+.project-box{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 2fr));
+    place-items: center;
+    gap: 3rem;
+    row-gap: 5rem;
+}
+.project-card{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background-color: #1b1b23;
+    border: 2px solid #ff8a8a;
+    border-radius: 3rem;
+    gap: 2rem;
+    padding: 5rem 2rem;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 0 5px #ff8a8a;
+    transition: 0.3s ease;
+}
+.project-card:hover{
+    box-shadow: 0 0 25px #ff8a8a, 
+                0 0 50px #ff8a8a;
+    transform: scale(1.02);
+}
+.project-card img{
+    max-width: 300px;
+    border-radius: 2em;
+    object-fit: cover;
+}
+.project-card h3{
+    font-size: 3rem;
+}
+.project-card p {
+    font-size: 2rem;
+}
+
+.btn{
+    display: inline-block;
+    padding: 1rem 3rem;
+    background-color: #ff8a8a;
+    box-shadow: 0 0 25px #ff8a8a;
+    border-radius: 3rem;
+    font-size: 1.8rem;
+    color: black;
+    border: 2px solid transparent;
+    font-weight: 600;
+    transition: 0.3s ease-in-out;
+}
+.btn:hover{
+    transform: scale(1.05);
+    box-shadow: 0 0 25px #ff8a8a,
+                0 0 50px #ff8a8a;
+}
+.btn a{
+    color: black;
 }
