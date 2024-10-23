@@ -1,37 +1,49 @@
 @font-face{
-    font-family: SuperFunky;
-    src: url(SuperFunky-lgmWw.ttf);
+    font-family: Satoshi;
+    src: url("/Fonts/Satoshi-Variable.ttf");
 }
-
+html{
+font-size: 60%;
+overflow-x: hidden;
+}
 body{
-    font-family: SuperFunky;
-    background-color: black;
-    font-size: large;
+    font-family: Satoshi;
+    background-color: #1b1b23;
+    color: aliceblue;
 }
-
-a:visited, a:link{
-    color: orange;
-    text-decoration: none;
-}
-
-.logo{
-    font-size: 60%;
-    font-weight: bold;
-    background: linear-gradient(to bottom, rgb(221,161,94) 50%, rgb(237, 123, 1) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    color: transparent;
-}
-
 .header{
     position: fixed;
     width: 100;
+    top: 0;
+    left: 0;
     padding: 4rem 15%;
-    background-color: black;
+    background-color: #1b1b23;
     backdrop-filter: blur(10px);
     display: flex;
     justify-content: space-between;
     align-items: center;
     z-index: 1000;
+}
+#menu-icon{
+    font-size: 3.5rem;
+    color: rgb(255, 255, 255);
+    display: none;
+}
+.logo{
+    font-size: 3rem;
+    color: rgb(255, 255, 255);
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+}
+.logo:hover{
+    transform: scale(1.1);
+}
+
+span{
+    background: linear-gradient(
+    270deg,
+    #FF8F85,
+    #FFA69E
+    );
 }
