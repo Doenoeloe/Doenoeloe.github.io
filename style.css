@@ -203,3 +203,108 @@ section{
 .btn a{
     color: black;
 }
+
+/*Zomboolean HTML*/
+.Zomboolean{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20rem;
+}
+.zomboolean-content{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    text-align: left;
+}
+.zomboolean-content h2{
+    font-size: 8rem;
+    font-weight: 700;
+    margin-top: 1.5rem;
+    line-height: 1;
+}
+.zomboolean-content p{
+    font-size: 2rem;
+    font-weight: 500;
+    line-height: 1.8;
+}
+.game-img img{
+    width: 32vw;
+    box-shadow: 0 0 20px #ff8a8a;
+    transition: 0.4s ease-in-out;
+}
+.zomboolean-text{
+    margin-right: 3rem;
+}
+.info{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5rem;
+}
+.zomboolean-info h2{
+    font-size: 7rem;
+    text-align: center;
+}
+.zomboolean-info p{
+    font-size: 2rem;
+    text-align: left;
+    margin: 3rem 0.5rem;
+}
+.zomboolean-info iframe{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.contributie{
+    color: black;
+}
+.contributie h2{
+    color: aliceblue;
+}
+.box-container{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px,1fr));
+    align-items: center;
+    gap: 2.5rem;
+}
+.model-box{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #ff8a8a;
+    height: 600px;
+    border-radius: 3rem;
+    cursor: pointer;
+    border: 5px solid transparent;
+    transition: 0.4s ease-in-out;
+}
+.model-box:hover{
+    background: #1b1b23;
+    color: #ff8a8a;
+    border: 5px solid #ff8a8a;
+    transform: scale(1.03);
+}
+.model-info{
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    padding: 5rem;
+}
+.model-info h4{
+    font-size: 4rem;
+    margin: 2rem 0;
+    font-weight: 800;
+}
+.model-info p{
+    font-size: 1.4rem;
+    font-weight: 600;
+    line-height: 1.7;
+}
+
+
