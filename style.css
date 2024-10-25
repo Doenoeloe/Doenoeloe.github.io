@@ -265,6 +265,13 @@ section{
 .contributie h2{
     color: aliceblue;
 }
+.contributie-content p{
+    margin-top: 20px;
+    color: aliceblue;
+    font-size: 2rem;
+    font-weight: 500;
+    line-height: 1.8;
+}
 .box-container{
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px,1fr));
@@ -301,13 +308,12 @@ section{
     margin: 2rem 0;
     font-weight: 800;
 }
-.model-info p{
-    font-size: 1.4rem;
-    font-weight: 600;
-    line-height: 1.7;
-}
 .model-info img{
     width: 70%;
 }
-
+.model-info h3{
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 1.7;
+}
 
