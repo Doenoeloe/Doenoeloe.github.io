@@ -148,7 +148,7 @@ section{
     grid-template-columns: repeat(auto-fit, minmax(350px, 2fr));
     place-items: center;
     gap: 3rem;
-    row-gap: 5rem;
+    row-gap: 3rem;
 }
 .project-card{
     display: flex;
@@ -181,6 +181,8 @@ section{
 }
 .project-card p {
     font-size: 2rem;
+    font-weight: 500;
+    line-height: 1.8;
 }
 
 .btn{
@@ -316,4 +318,14 @@ section{
     font-weight: 600;
     line-height: 1.7;
 }
-
+.code-info{
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    padding: 5rem;
+}
+.code-info img{
+    width: 70rem;
+}
