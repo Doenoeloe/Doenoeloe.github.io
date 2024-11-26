@@ -10,8 +10,8 @@
     scroll-behavior: smooth;
 }
 html{
-font-size: 60%;
-overflow-x: hidden;
+    font-size: 60%;
+    overflow-x: hidden;
 }
 body{
     font-family: Satoshi;
@@ -71,7 +71,7 @@ span{
 }
 
 section{
-    min-height: 90vh;
+    min-height: 100vh;
     padding: 10rem 15%;
 }
 .home{
@@ -138,27 +138,26 @@ section{
     text-align: left;
     margin: 3rem 0.5rem;
 }
-.heading{
-    text-align: center;
-    font-size: 7rem;
-    margin: 5rem 0;
-}
+
 .project-box{
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 2fr));
+    grid-template-columns: repeat(3,1fr);
     place-items: center;
+    margin: 5rem 0;
     gap: 3rem;
-    row-gap: 3rem;
+    row-gap: 5rem;
 }
 .project-card{
+    height: 600px;
+    max-width: 450px;
+
+    text-align: center;
+    border: 2px solid #ff8a8a;
+    border-radius: 3rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    text-align: center;
-    background-color: #1b1b23;
-    border: 2px solid #ff8a8a;
-    border-radius: 3rem;
     gap: 2rem;
     padding: 5rem 2rem;
     overflow: hidden;
@@ -167,24 +166,25 @@ section{
     transition: 0.3s ease;
 }
 .project-card:hover{
-    box-shadow: 0 0 25px #ff8a8a,
+    box-shadow: 0 0 25px #ff8a8a
                 0 0 50px #ff8a8a;
     transform: scale(1.02);
 }
 .project-card img{
     max-width: 300px;
-    border-radius: 2em;
+    border-radius: 2rem;
     object-fit: cover;
 }
 .project-card h3{
     font-size: 3rem;
 }
-.project-card p {
-    font-size: 2rem;
-    font-weight: 500;
-    line-height: 1.8;
+.project-card p{
+    font-size: 1.6;
 }
-
+.heading{
+    text-align: center;
+    font-size: 7rem;
+}
 .btn{
     display: inline-block;
     padding: 1rem 3rem;
@@ -205,6 +205,56 @@ section{
 .btn a{
     color: black;
 }
+
+.contact h2{
+    margin-bottom: 3rem;
+    color: aliceblue;
+}
+.contact form{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3rem;
+    margin: 5rem 0;
+    text-align: center;
+}
+.contact form .input-box input, .contact form textarea{
+    width: 100%;
+    padding: 2.5rem;
+    font-size: 1.8rem;
+    color: aliceblue;
+    background-color: #1b1b23;
+    border-radius: 2rem;
+    border: 2px solid #ff8a8a;
+    margin: 1.5rem 0;
+    resize: none    ;
+}
+.footer{
+    padding: 50px 0;
+}
+.footer .social-icons{
+    text-align: center;
+}
+.footer ul{
+    text-align: center;
+    font-size: 1.8rem;
+}
+.footer ul li{
+    display: inline-block;
+    margin-left: 20px;
+}
+.footer ul li a{
+    color: aliceblue;
+    transition: 0.3s ease-in-out;
+    border-bottom: 3px solid transparent;
+}
+.footer ul li a:hover{
+    color: #ff8a8a;
+    border-bottom: 3px solid #ff8a8a;
+}
+
+
+
 
 /*Zomboolean HTML*/
 .Zomboolean{
@@ -328,4 +378,53 @@ section{
 }
 .code-info img{
     width: 70rem;
+}
+
+
+
+@media(max-width:1285px){
+    #menu-icon{
+        display: block;
+    }
+    .navbar{
+        position: absolute;
+        top: 100%;
+        right: 0;
+        width: 50%;
+        padding: 1rem 3rem;
+        background: rgba(0, 0, 0, 0.8);
+        border-bottom-left-radius: 2rem;
+        border-left: 2px solid #ff8a8a;
+        border-bottom: 2px solid #ff8a8a;
+        display: none;
+    }
+    .navbar a{
+        display: block;
+        font-size: 2rem;
+        margin: 3rem 0;
+        color: aliceblue;
+    }
+    .navbar.active{
+        display: block;
+    }
+    .home{
+        flex-direction: column-reverse;
+        margin: 5rem 0;
+        gap: 5rem;
+    }
+    .home-content{
+        align-items: center;
+        text-align: center;
+    }
+    .about{
+        flex-direction: column-reverse;
+        text-align: center;
+    }
+    .about h2{
+        text-align: center;
+        margin: 2rem 0;
+    }
+    .contact form{
+        flex-direction: column;
+    }
 }
