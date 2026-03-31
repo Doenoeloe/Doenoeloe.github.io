@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daniël Freriksen - Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:ital,wght@0,400;0,600;0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg:#12100e; --surface:#1a1815; --card:#22201c; --border:#32302a;
+  --text:#e8e0d0; --muted:#7a7469; --yellow:#c9a87c; --pink:#c49a8a;
+  --cyan:#8aab9a; --orange:#b8865a; --purple:#9a8a7a; --blue:#a8b8c8;
+}
+html { scroll-behavior: smooth; }
+body { background:var(--bg); color:var(--text); font-family:'Nunito',sans-serif; overflow-x:hidden; cursor:none; }
+
+/* Cursor */
+#cursor { position:fixed; width:14px; height:14px; background:var(--yellow); border-radius:50%; pointer-events:none; z-index:9999; transform:translate(-50%,-50%); mix-blend-mode:difference; transition:width .15s,height .15s; }
+#cursor.big { width:36px; height:36px; }
+
+/* Background canvas */
+#bg-canvas {
+  position:fixed; top:0; left:0; width:100%; height:100%; z-index:2; pointer-events:none;
+
+  -webkit-mask-image: radial-gradient(ellipse 65% 80% at 50% 45%, black 30%, transparent 80%);
+  mask-image: radial-gradient(ellipse 65% 80% at 50% 45%, black 30%, transparent 80%);
+  opacity: 0.88;
+}
+
+/* Drop zone - shown when GLB not found */
+#drop-zone {
+  position:fixed; bottom:24px; right:24px; z-index:200;
+  display:flex; flex-direction:column; align-items:flex-end; gap:8px;
+}
+#drop-zone.hidden { display:none; }
+#drop-zone h2 { font-size:32px; color:var(--yellow); }
+#drop-zone p { color:var(--muted); font-family:'Nunito',sans-serif; font-size:15px; }
+#drop-area {
+  border:2px dashed var(--border); border-radius:20px; padding:48px 64px;
+  text-align:center; cursor:pointer; transition:border-color .2s;
+  color:var(--muted); font-family:'Nunito',sans-serif; font-size:14px;
+}
+#drop-area:hover, #drop-area.drag-over { border-color:var(--yellow); color:var(--yellow); }
+#drop-area .drop-icon { font-size:48px; margin-bottom:12px; }
+#file-input { display:none; }
+
+/* Blobs */
+.blob { position:fixed; border-radius:50%; filter:blur(80px); opacity:0.18; pointer-events:none; z-index:0; animation:blobFloat 8s ease-in-out infinite alternate; }
+.blob-1 { width:500px; height:500px; background:var(--purple); bottom:-100px; left:50%; transform:translateX(-50%); }
+.blob-2 { width:300px; height:300px; background:var(--pink); top:20%; right:5%; animation-delay:-3s; }
+.blob-3 { width:260px; height:260px; background:var(--cyan); top:30%; left:5%; animation-delay:-5s; }
+@keyframes blobFloat { from{transform:translateX(-50%) translateY(0) scale(1)} to{transform:translateX(-50%) translateY(-30px) scale(1.05)} }
+
+#star-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Tracking badge */
+#tracking-badge {
+  display:flex; align-items:center; gap:8px;
+  border:1px solid var(--border); border-radius:999px; padding:7px 14px;
+  font-family:'Space Mono',monospace; font-size:11px; color:var(--muted); cursor:none;
+  transition:border-color .3s, color .3s; white-space:nowrap;
+}
+#tracking-badge.active { border-color:var(--cyan); color:var(--cyan); }
+#tracking-badge.active .badge-dot { background:var(--cyan); }
+.badge-dot { width:7px; height:7px; border-radius:50%; background:var(--muted); animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* Nav */
+nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; justify-content:space-between; align-items:center; padding:18px 48px; background:rgba(18,16,14,0.6); backdrop-filter:blur(16px); border-bottom:1px solid rgba(255,255,255,0.05); }
+.nav-logo { font-family:'Fredoka One',cursive; font-size:26px; letter-spacing:.05em; text-decoration:none; color:var(--text); }
+.nav-logo span { color:var(--yellow); }
+.nav-links { display:flex; gap:36px; list-style:none; }
+.nav-links a { color:var(--muted); text-decoration:none; font-size:13px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; transition:color .2s; position:relative; }
+.nav-links a::after { content:''; position:absolute; bottom:-3px; left:0; width:0; height:2px; background:var(--yellow); border-radius:2px; transition:width .3s; }
+.nav-links a:hover { color:var(--yellow); }
+.nav-links a:hover::after { width:100%; }
+
+/* Page content */
+.page { position:relative; z-index:10; }
+
+/* Hero */
+#hero { min-height:100vh; display:flex; align-items:center; padding:120px 48px 80px; }
+.hero-content { max-width:560px; }
+.hero-tag { display:inline-flex; align-items:center; gap:8px; background:rgba(255,209,102,0.12); border:1px solid rgba(255,209,102,0.3); color:var(--yellow); font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; padding:6px 14px; border-radius:999px; margin-bottom:24px; }
+.hero-title { font-family:'Fredoka One',cursive; font-size:clamp(52px,6vw,88px); line-height:1.05; letter-spacing:.02em; margin-bottom:20px; }
+.hero-title .hl1 { background:linear-gradient(135deg,var(--yellow),var(--pink)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.hero-title .hl2 { background:linear-gradient(135deg,var(--cyan),var(--blue)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.hero-sub { color:var(--muted); font-size:17px; line-height:1.75; margin-bottom:36px; max-width:440px; }
+.hero-btns { display:flex; gap:14px; flex-wrap:wrap; }
+.btn { display:inline-flex; align-items:center; gap:8px; padding:13px 26px; border-radius:12px; font-family:'Nunito',sans-serif; font-weight:700; font-size:14px; text-decoration:none; cursor:none; transition:transform .15s,box-shadow .15s; border:none; letter-spacing:.03em; }
+.btn:hover { transform:translateY(-2px); }
+.btn-primary { background:linear-gradient(135deg,var(--yellow),var(--orange)); color:#1a1200; box-shadow:0 6px 24px rgba(255,209,102,.25); }
+.btn-primary:hover { box-shadow:0 10px 32px rgba(255,209,102,.4); }
+.btn-outline { background:transparent; color:var(--text); border:2px solid var(--border); }
+.btn-outline:hover { border-color:var(--purple); color:var(--purple); }
+
+/* Sections */
+section:not(#hero) { padding:100px 48px; border-top:1px solid rgba(255,255,255,0.04); }
+.section-eyebrow { font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--yellow); margin-bottom:12px; }
+.section-title { font-family:'Fredoka One',cursive; font-size:clamp(36px,4vw,56px); line-height:1.1; margin-bottom:48px; }
+
+/* About */
+#about .about-grid { display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center; }
+.about-text p { color:var(--muted); line-height:1.85; font-size:16px; margin-bottom:16px; }
+.about-text p strong { color:var(--text); }
+.about-tags {position: relative; display:flex; flex-wrap:wrap; gap:10px; margin-top:24px; }
+.about-tag {position: relative; padding:6px 14px; border-radius:8px; font-size:13px; font-weight:700; background:var(--card); border:1px solid var(--border); color:var(--muted); transition:all .2s; }
+.about-tag:hover { border-color:var(--pink); color:var(--pink); }
+.about-card { background:var(--card); border:1px solid var(--border); border-radius:20px; padding:36px; position:relative; overflow:hidden; }
+.about-card::before { content:''; position:absolute; top:-60px; right:-60px; width:200px; height:200px; background:radial-gradient(circle,rgba(168,85,247,.15),transparent 70%); border-radius:50%; }
+.about-stat { margin-bottom:28px; }
+.about-stat:last-child { margin-bottom:0; }
+.stat-num { font-family:'Fredoka One',cursive; font-size:48px; line-height:1; letter-spacing:.02em; }
+.stat-num.y{color:var(--yellow)} .stat-num.p{color:var(--pink)} .stat-num.c{color:var(--cyan)}
+.stat-label { color:var(--muted); font-size:14px; margin-top:2px; }
+
+.tag-tooltip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .2s, transform .2s;
+  z-index: 50;
+  box-shadow: 0 8px 24px rgba(0,0,0,.3);
+}
+
+.tag-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--border);
+}
+
+.about-tag:hover .tag-tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Projects */
+#projects .projects-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:24px; }
+.project-card { background:var(--card); border:1px solid var(--border); border-radius:20px; overflow:hidden; transition:transform .25s,border-color .25s,box-shadow .25s; cursor:none; }
+.project-card:hover { transform:translateY(-6px); border-color:var(--purple); box-shadow:0 20px 48px rgba(168,85,247,.15); }
+.project-thumb { height:180px; display:flex; align-items:center; justify-content:center; font-size:64px; position:relative; overflow:hidden; }
+.project-thumb::after { content:''; position:absolute; inset:0; background:linear-gradient(to bottom,transparent 50%,var(--card)); }
+.project-body { padding:20px 24px 24px; }
+.project-tag { display:inline-block; padding:3px 10px; border-radius:6px; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:10px; }
+.tag-game{background:rgba(255,209,102,.15);color:var(--yellow)} .tag-web{background:rgba(76,201,240,.15);color:var(--blue)} .tag-art{background:rgba(255,107,157,.15);color:var(--pink)} .tag-tool{background:rgba(6,214,160,.15);color:var(--cyan)}
+.project-name { font-family:'Fredoka One',cursive; font-size:22px; margin-bottom:8px; }
+.project-desc { color:var(--muted); font-size:14px; line-height:1.7; }
+
+/* Modal */
+.modal-backdrop {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(10,9,20,0.85);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity .25s;
+  backdrop-filter: blur(6px);
+}
+.modal-backdrop.open { opacity: 1; pointer-events: all; }
+.modal-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  width: min(680px, 92vw);
+  max-height: 88vh;
+  overflow-y: auto;
+  transform: translateY(16px) scale(0.97);
+  transition: transform .3s cubic-bezier(.16,1,.3,1);
+  position: relative;
+}
+.modal-backdrop.open .modal-box { transform: translateY(0) scale(1); }
+.modal-header {
+  padding: 28px 28px 0;
+  display: flex; justify-content: space-between; align-items: flex-start;
+}
+.modal-close {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 50%; width: 36px; height: 36px;
+  color: var(--muted); font-size: 18px; line-height: 1;
+  cursor: none; display: flex; align-items: center; justify-content: center;
+  transition: border-color .2s, color .2s; flex-shrink: 0;
+}
+.modal-close:hover { border-color: var(--pink); color: var(--pink); }
+.modal-thumb {
+  height: 200px; display: flex; align-items: center;
+  justify-content: center; font-size: 80px;
+  border-radius: 16px; margin: 20px 28px;
+}
+.modal-body { padding: 0 28px 28px; }
+.modal-tag { display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 10px; }
+.modal-title { font-family: 'Fredoka One', cursive; font-size: 32px; margin-bottom: 12px; }
+.modal-desc { color: var(--muted); font-size: 15px; line-height: 1.8; margin-bottom: 24px; }
+.modal-section-title { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+.modal-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+.modal-chip { padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; background: var(--surface); border: 1px solid var(--border); color: var(--muted); }
+.modal-links { display: flex; gap: 12px; flex-wrap: wrap; }
+.modal-link { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 700; text-decoration: none; border: 1px solid var(--border); color: var(--text); transition: all .2s; cursor: none; }
+.modal-link:hover { border-color: var(--yellow); color: var(--yellow); }
+.modal-link.primary { background: linear-gradient(135deg, var(--yellow), var(--orange)); color: #1a1200; border-color: transparent; }
+.modal-link.primary:hover { color: #1a1200; box-shadow: 0 6px 20px rgba(255,209,102,.3); }
+
+/* Slideshow */
+.modal-slideshow {
+  position: relative;
+  height: 220px;
+  margin: 20px 28px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--surface);
+}
+.slide {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0;
+  transition: opacity .35s ease;
+  font-size: 80px;
+}
+.slide img, .slide video {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  border-radius: 16px;
+}
+.slide.active { opacity: 1; }
+.slide-btn {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  background: rgba(15,14,23,0.7); border: 1px solid var(--border);
+  color: var(--text); border-radius: 50%;
+  width: 34px; height: 34px; font-size: 16px; line-height: 1;
+  cursor: none; z-index: 10; display: flex; align-items: center; justify-content: center;
+  transition: background .2s, border-color .2s;
+  backdrop-filter: blur(6px);
+}
+.slide-btn:hover { background: rgba(255,209,102,0.2); border-color: var(--yellow); color: var(--yellow); }
+.slide-btn.prev { left: 10px; }
+.slide-btn.next { right: 10px; }
+.slide-dots {
+  position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 6px; z-index: 10;
+}
+.slide-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,0.35);
+  cursor: none; transition: background .2s, transform .2s;
+}
+.slide-dot.active { background: var(--yellow); transform: scale(1.3); }
+.slide-counter {
+  position: absolute; top: 10px; right: 12px;
+  font-family: 'Space Mono', monospace; font-size: 10px;
+  color: rgba(255,255,255,0.5); z-index: 10;
+  background: rgba(15,14,23,0.5); padding: 3px 8px; border-radius: 999px;
+  backdrop-filter: blur(4px);
+}
+
+/* Skills */
+#skills .skills-layout { display:grid; grid-template-columns:1fr 1fr; gap:64px; }
+.skill-group-title { font-family:'Fredoka One',cursive; font-size:22px; margin-bottom:24px; }
+.skill-item { margin-bottom:20px; }
+.skill-top { display:flex; justify-content:space-between; font-size:14px; font-weight:700; margin-bottom:8px; }
+.skill-bar { height:6px; background:var(--border); border-radius:999px; overflow:hidden; }
+.skill-fill { height:100%; border-radius:999px; width:0; transition:width 1.4s cubic-bezier(.16,1,.3,1); }
+.fill-yellow{background:linear-gradient(90deg,var(--yellow),var(--orange))} .fill-pink{background:linear-gradient(90deg,var(--pink),var(--purple))} .fill-cyan{background:linear-gradient(90deg,var(--cyan),var(--blue))}
+.skill-fill.animate { width:var(--w); }
+.tools-grid { display:flex; flex-wrap:wrap; gap:12px; }
+.tool-chip { display:flex; align-items:center; gap:8px; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:10px 16px; font-size:13px; font-weight:700; color:var(--muted); transition:all .2s; }
+.tool-chip:hover { border-color:var(--cyan); color:var(--cyan); transform:translateY(-2px); }
+.tool-chip .ti { font-size:18px; }
+
+/* Contact */
+#contact .contact-grid { display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:start; }
+.contact-lead { color:var(--muted); font-size:17px; line-height:1.75; margin-bottom:32px; }
+.contact-items { display:flex; flex-direction:column; gap:14px; }
+.contact-item { display:flex; align-items:center; gap:14px; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px 18px; text-decoration:none; color:var(--text); font-weight:700; font-size:14px; transition:all .2s; cursor:none; }
+.contact-item:hover { border-color:var(--yellow); color:var(--yellow); transform:translateX(4px); }
+.contact-icon { font-size:22px; }
+.contact-form { display:flex; flex-direction:column; gap:16px; }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.field { display:flex; flex-direction:column; gap:6px; }
+.field label { font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+.field input,.field textarea { background:var(--card); border:1.5px solid var(--border); border-radius:10px; color:var(--text); font-family:'Nunito',sans-serif; font-size:14px; padding:12px 16px; outline:none; cursor:none; transition:border-color .2s; resize:none; }
+.field input:focus,.field textarea:focus { border-color:var(--yellow); }
+.field textarea { min-height:110px; }
+
+/* Footer */
+footer { border-top:1px solid rgba(255,255,255,.05); padding:28px 48px; display:flex; justify-content:space-between; align-items:center; position:relative; z-index:10; }
+.footer-logo { font-family:'Fredoka One',cursive; font-size:20px; color:var(--muted); }
+.footer-copy { font-size:12px; color:var(--muted); }
+
+/* Webcam hint */
+#webcam-hint { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:200; background:rgba(18,16,14,0.6);  backdrop-filter:blur(10px); border:1px solid var(--yellow); border-radius:12px; padding:12px 20px; font-size:13px; color:var(--yellow); font-weight:700; display:flex; align-items:center; gap:10px; max-width:420px; text-align:center; }
+#webcam-hint .wb { background:var(--yellow); color:#1a1200; border:none; border-radius:8px; padding:6px 14px; font-weight:700; font-family:'Nunito',sans-serif; font-size:12px; cursor:none; }
+#webcam-hint .ws { background:transparent; color:var(--muted); border:none; font-family:'Nunito',sans-serif; font-size:12px; cursor:none; }
+
+/* Reveal */
+.reveal { opacity:0; transform:translateY(28px); transition:opacity .7s ease,transform .7s ease; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:var(--bg); }
+::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+::-webkit-scrollbar-thumb:hover { background:var(--purple); }
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+<canvas id="star-canvas"></canvas>
+<script>
+(function() {
+  const c = document.getElementById('star-canvas');
+  const ctx = c.getContext('2d');
+  let stars = [];
+
+  function resize() {
+    c.width = innerWidth;
+    c.height = innerHeight;
+    buildStars();
+  }
+
+  function buildStars() {
+    stars = [];
+    const count = Math.floor((innerWidth * innerHeight) / 4000);
+    for (let i = 0; i < count; i++) {
+      stars.push({
+        x: Math.random() * innerWidth,
+        y: Math.random() * innerHeight,
+        r: Math.random() * 1.4 + 0.2,
+        alpha: Math.random() * 0.6 + 0.2,
+        speed: Math.random() * 0.008 + 0.002,
+        phase: Math.random() * Math.PI * 2,
+        // occasional color tints
+        hue: Math.random() < 0.15 ? (Math.random() < 0.5 ? 200 : 30) : 0,
+        sat: Math.random() < 0.15 ? 80 : 0,
+      });
+    }
+  }
+
+  let t = 0;
+  function draw() {
+    ctx.clearRect(0, 0, c.width, c.height);
+    t += 0.016;
+    for (const s of stars) {
+      const a = s.alpha * (0.6 + 0.4 * Math.sin(t * s.speed * 60 + s.phase));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = s.hue
+        ? `hsla(${s.hue},${s.sat}%,90%,${a})`
+        : `rgba(255,255,255,${a})`;
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+  draw();
+})();
+</script>
+<canvas id="bg-canvas"></canvas>
+
+
+<div id="drop-zone">
+  <div id="drop-panel" style="display:none; background:var(--card); border:1px solid var(--border); border-radius:16px; padding:20px; width:260px;">
+    <p style="color:var(--muted); font-size:13px; margin-bottom:12px;">Drop een .glb bestand om een 3D karakter te tonen</p>
+    <div id="drop-area" onclick="document.getElementById('file-input').click()">
+      <div class="drop-icon" style="font-size:32px;">📂</div>
+      Klik of sleep je .glb hier
+    </div>
+    <input type="file" id="file-input" accept=".glb,.gltf">
+  </div>
+  <button onclick="toggleDropPanel()" style="background:var(--card); border:1px solid var(--border); border-radius:10px; padding:8px 14px; color:var(--muted); font-family:'Nunito',sans-serif; font-size:13px; cursor:none;">🐱 Laad karakter</button>
+</div>
+
+<nav>
+  <a href="#" class="nav-logo">Daniël<span></span> Freriksen</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div id="tracking-badge">
+    <div class="badge-dot"></div>
+    <span id="badge-text">Mouse Tracking</span>
+  </div>
+</nav>
+
+<div class="page">
+
+  <section id="hero">
+    <div class="hero-content">
+      <div class="hero-tag reveal"> Open to adventures</div>
+      <h1 class="hero-title reveal">Hi, I'm<br><span class="hl1">Daniël</span><br><span class="hl2">Freriksen</span></h1>
+      <p class="hero-sub reveal">A software developer who <strong>wishes to learn more and more about programming</strong> - from games to interfaces, always with a dash of adventure and a pinch of magic.</p>
+      <div class="hero-btns reveal">
+        <a href="#projects" class="btn btn-primary">See my work</a>
+        <a href="#contact" class="btn btn-outline">Say hello</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="about">
+    <div class="section-eyebrow reveal">Who am I?</div>
+    <h2 class="section-title reveal">About Me</h2>
+    <div class="about-grid reveal">
+      <div class="about-text">
+        <p>Hey there! I'm <strong>Daniël</strong>, a creative developer with a love for <strong>interactive experiences</strong> and storytelling through code. I wander the digital wilderness with a backpack full of ideas.</p>
+        <p>I specialize in building <strong>games and 3D visualizations</strong> that feel alive and delightful to explore. My toolkit is big, my curiosity is bigger.</p>
+        <p>When I'm not coding, you'll find me sketching characters, exploring game design, or staring at a beautiful render wondering how it works.</p>
+        <div class="about-tags">
+          <span class="about-tag" data-tip="Building games with Unity, Godot and custom engines">🎮 Game Dev</span>
+          <span class="about-tag" data-tip="Creating mobile & desktop apps with clean UIs">📱 App Dev</span>
+          <span class="about-tag" data-tip="Sculpting and texturing 3D characters in Blender">🎨 3D Art</span>
+          <span class="about-tag" data-tip="Animations, shaders and satisfying motion design">✨ Motion</span>
+        </div>
+      </div>
+      <div class="about-card">
+        <div class="about-stat"><div class="stat-num y">10</div><div class="stat-label">Projects shipped into the wild</div></div>
+        <div class="about-stat"><div class="stat-num p">3 yr</div><div class="stat-label">Years of creative adventures</div></div>
+        <div class="about-stat"><div class="stat-num c">∞</div><div class="stat-label">Curiosity remaining</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="projects">
+    <div class="section-eyebrow reveal">What I've built</div>
+    <h2 class="section-title reveal">Selected Works</h2>
+    <div class="projects-grid reveal">
+      <div class="project-card" onclick="openModal('island')">
+        <div class="project-thumb" style="background:linear-gradient(135deg,#1a1230,#2d1b4e)">🏝️</div>
+        <div class="project-body"><span class="project-tag tag-game">Game</span><div class="project-name">Island generation</div><div class="project-desc">Procedurally generated islands out in a ocean built in Unity.</div></div>
+      </div>
+      <div class="project-card" onclick="openModal('kamo')">
+        <div class="project-thumb" style="background:linear-gradient(135deg,#0d2137,#0a3d5c)">🦆</div>
+        <div class="project-body"><span class="project-tag tag-game">Game</span><div class="project-name">Kamo</div><div class="project-desc">A roguelike tower climb where you play as little ducky with a huge shotgun!</div></div>
+      </div>
+      <div class="project-card" onclick="openModal('characters')">
+        <div class="project-thumb" style="background:linear-gradient(135deg,#2d0a1e,#4a1030)">🎨</div>
+        <div class="project-body"><span class="project-tag tag-art">3D Art</span><div class="project-name">Character Series</div><div class="project-desc">Characters created from tutorials and theory picked up along the way.</div></div>
+      </div>
+      <div class="project-card" onclick="openModal('weapons')">
+        <div class="project-thumb" style="background:linear-gradient(135deg,#0a2d1e,#0d4a30)">🔫</div>
+        <div class="project-body"><span class="project-tag tag-art">3D Models</span><div class="project-name">Models for weapons</div><div class="project-desc">Weapon models made for a zombie game. I swear they're not lethal 🙏</div></div>
+      </div>
+      <div class="project-card" onclick="openModal('customer')">
+        <div class="project-thumb" style="background:linear-gradient(135deg,#2d2200,#4a3800)">📱</div>
+        <div class="project-body"><span class="project-tag tag-tool">Tool</span><div class="project-name">Customer Manager</div><div class="project-desc">A WPF app to create, save and edit customer data, built during my internship.</div></div>
+      </div>
+      <div class="project-card" onclick="openModal('particles')">
+        <div class="project-thumb" style="background:linear-gradient(135deg,#2d2200,#4a3800)">🐍</div>
+        <div class="project-body"><span class="project-tag tag-art">3D Simulation</span><div class="project-name">Particle simulation</div><div class="project-desc">A wild vortex simulation made with only Python code in Blender.</div></div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-backdrop" id="project-modal" onclick="handleBackdropClick(event)">
+      <div class="modal-box">
+        <div class="modal-header">
+          <div>
+            <span class="modal-tag" id="modal-tag"></span>
+            <h2 class="modal-title" id="modal-title"></h2>
+          </div>
+          <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-slideshow" id="modal-slideshow">
+          <div class="slide-counter" id="slide-counter">1 / 1</div>
+          <div id="modal-slides"></div>
+          <button class="slide-btn prev" id="slide-prev" onclick="slideNav(-1)">&#8249;</button>
+          <button class="slide-btn next" id="slide-next" onclick="slideNav(1)">&#8250;</button>
+          <div class="slide-dots" id="slide-dots"></div>
+        </div>
+        <div class="modal-body">
+          <p class="modal-desc" id="modal-desc"></p>
+          <div class="modal-section-title">Tech stack</div>
+          <div class="modal-chips" id="modal-chips"></div>
+          <div class="modal-section-title">Links</div>
+          <div class="modal-links" id="modal-links"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="skills">
+    <div class="section-eyebrow reveal">What I know</div>
+    <h2 class="section-title reveal">Skills</h2>
+    <div class="skills-layout reveal">
+      <div>
+        <div class="skill-group-title">Creative Code</div>
+        <div class="skill-item"><div class="skill-top"><span>Unity / C#</span><span style="color:var(--cyan)">80%</span></div><div class="skill-bar"><div class="skill-fill fill-cyan" style="--w:80%"></div></div></div>
+        <div class="skill-item"><div class="skill-top"><span>`WPF/ XAML</span><span style="color:var(--yellow)">70%</span></div><div class="skill-bar"><div class="skill-fill fill-yellow" style="--w:70%"></div></div></div>
+        <div class="skill-item"><div class="skill-top"><span>JavaScript</span><span style="color:var(--pink)">60%</span></div><div class="skill-bar"><div class="skill-fill fill-pink" style="--w:60%"></div></div></div>
+        <div class="skill-item"><div class="skill-top"><span>Python</span><span style="color:var(--pink)">65%</span></div><div class="skill-bar"><div class="skill-fill fill-pink" style="--w:65%"></div></div></div>
+        <div class="skill-item"><div class="skill-top"><span>Blender</span><span style="color:var(--cyan)">60%</span></div><div class="skill-bar"><div class="skill-fill fill-cyan" style="--w:60%"></div></div></div>
+      </div>
+      <div>
+        <div class="skill-group-title">Tools & Tech</div>
+        <div class="tools-grid">
+          <div class="tool-chip"><span class="ti">🐱</span> Blender</div>
+          <div class="tool-chip"><span class="ti">🎮</span> Unity</div>
+          <div class="tool-chip"><span class="ti">✏️</span> Figma</div>
+          <div class="tool-chip"><span class="ti">🐙</span> Git</div>
+          <div class="tool-chip"><span class="ti">🐳</span> Docker</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="section-eyebrow reveal">Get in touch</div>
+    <h2 class="section-title reveal">Let's Build Something</h2>
+    <div class="contact-grid reveal">
+      <div>
+        <p class="contact-lead">Got a project, collab idea, or just want to chat about cool stuff? My inbox is always open - I promise I don't bite.</p>
+        <div class="contact-items">
+          <a href="mailto:hello@catdev.io" class="contact-item"><span class="contact-icon">📧</span>danielfreriksen@gmail.com</a>
+          <a href="#" class="contact-item"><span class="contact-icon">🐦</span>@doenoeloe</a>
+          <a href="#" class="contact-item"><span class="contact-icon">📷</span>@doenoeloe</a>
+          <a href="#" class="contact-item"><span class="contact-icon">📷</span>Also a hobbyist photographer - @doenoeloops</a>
+          <a href="#" class="contact-item"><span class="contact-icon">💼</span>linkedin.com/in/doenoeloe</a>
+          <a href="#" class="contact-item"><span class="contact-icon">🐙</span>github.com/doenoeloe</a>
+        </div>
+      </div>
+      <form class="contact-form" id="contact-form" action="https://formspree.io/f/maqljogr" method="POST">
+        <div class="form-row">
+          <div class="field"><label>Name</label><input type="text" name="name" placeholder="Your name"></div>
+          <div class="field"><label>Email</label><input type="email" name="email" placeholder="your@email.com"></div>
+        </div>
+        <div class="field"><label>Subject</label><input type="text" name="subject" placeholder="What's the adventure?"></div>
+        <div class="field"><label>Message</label><textarea name="message" placeholder="Tell me everything..."></textarea></div>
+        <button type="submit" class="btn btn-primary" style="align-self:flex-start" id="submit-btn">
+          🚀 Send it!
+        </button>
+        <p id="form-msg" style="display:none; font-size:14px; margin-top:8px;"></p>
+      </form>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="footer-logo">Daniël Freriksen</div>
+  <div class="footer-copy">© 2026 - Made with ☕ and curiosity</div>
+</footer>
+
+<div id="webcam-hint" style="display:none">
+  🎥 Enable webcam for real face tracking?
+  <button class="wb" onclick="startWebcam()">Enable</button>
+  <button class="ws" onclick="document.getElementById('webcam-hint').style.display='none'">Skip</button>
+</div>
+
+<script>
+
+function toggleDropPanel() {
+  const panel = document.getElementById('drop-panel');
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+document.querySelectorAll('.about-tag[data-tip]').forEach(tag => {
+  const tip = document.createElement('span');
+  tip.className = 'tag-tooltip';
+  tip.textContent = tag.dataset.tip;
+  tag.appendChild(tip);
+  tag.style.position = 'relative';
+});
+
+// ==============================================================
+//  CURSOR
+// ==============================================================
+const cursor = document.getElementById('cursor');
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top  = e.clientY + 'px';
+});
+document.querySelectorAll('a,button,.project-card,.tool-chip,.contact-item,.about-tag').forEach(el => {
+  el.addEventListener('mouseenter', () => cursor.classList.add('big'));
+  el.addEventListener('mouseleave', () => cursor.classList.remove('big'));
+});
+
+// ==============================================================
+//  SCROLL REVEALS
+// ==============================================================
+new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) setTimeout(() => e.target.classList.add('visible'), i * 60);
+  });
+}, { threshold: 0.1 }).observe.bind(
+  new IntersectionObserver((entries) => {
+    entries.forEach((e,i) => { if(e.isIntersecting) setTimeout(() => e.target.classList.add('visible'), i*60); });
+  }, { threshold: 0.1 })
+);
+// Simple reveal
+const ro = new IntersectionObserver(entries => {
+  entries.forEach((e,i) => { if(e.isIntersecting) setTimeout(() => e.target.classList.add('visible'), i*60); });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+
+// Skill bars
+new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.querySelectorAll('.skill-fill').forEach(f => f.classList.add('animate')); });
+}, { threshold: 0.2 }).observe(document.getElementById('skills'));
+
+// ==============================================================
+//  TREE.JS SCENE
+// ==============================================================
+const canvas  = document.getElementById('bg-canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setClearColor(0x000000, 0);
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.LinearToneMapping;  // No filmic crush - show true texture colors
+renderer.toneMappingExposure = 1.0;
+
+const scene = new THREE.Scene();
+
+const camera3d = new THREE.PerspectiveCamera(32, innerWidth / innerHeight, 0.1, 100);
+camera3d.position.set(0, 2.2, 7.5);
+camera3d.lookAt(0, 2.0, 0);
+
+// Lights
+// Neutral white lighting to show original material textures faithfully
+scene.add(new THREE.AmbientLight(0xffffff, 1.2));
+const key = new THREE.DirectionalLight(0xffffff, 1.8);
+key.position.set(2, 5, 4); scene.add(key);
+const fill = new THREE.DirectionalLight(0xffffff, 0.6);
+fill.position.set(-3, 2, 2); scene.add(fill);
+const back = new THREE.DirectionalLight(0xffffff, 0.3);
+back.position.set(0, 3, -5); scene.add(back);
+
+// Head tracking
+let headBone = null;
+const tgt = { x: 0, y: 0 };
+const cur = { x: 0, y: 0 };
+const MX = 0.42, MY = 0.55;
+let mouseNorm = { x: 0, y: 0 };
+document.addEventListener('mousemove', e => {
+  mouseNorm.x = (e.clientX / innerWidth)  * 2 - 1;
+  mouseNorm.y = (e.clientY / innerHeight) * 2 - 1;
+});
+
+// Load model from URL (called once we have a valid URL)
+function loadModel(url) {
+  const loader = new THREE.GLTFLoader();
+  loader.load(
+    url,
+    gltf => {
+      const model = gltf.scene;
+      // Scale & center
+      const box    = new THREE.Box3().setFromObject(model);
+      const size   = box.getSize(new THREE.Vector3());
+      const center = box.getCenter(new THREE.Vector3());
+      const scale  = 2.2 / size.y;
+      model.scale.setScalar(scale);
+      model.position.set(-center.x * scale, -box.min.y * scale, -center.z * scale);
+
+      // Find head bone
+      model.traverse(obj => {
+        if (!headBone && obj.isBone && obj.name.toLowerCase() === 'head') {
+          headBone = obj;
+          console.log('✅ Head bone found:', obj.name);
+        }
+        // Preserve original PBR textures - no transparency override
+        if (obj.isMesh) {
+          const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+          mats.forEach(m => {
+            if (m.map)          m.map.encoding = THREE.sRGBEncoding;
+            if (m.normalMap)    m.normalMap.encoding = THREE.LinearEncoding;
+            if (m.roughnessMap) m.roughnessMap.encoding = THREE.LinearEncoding;
+            m.transparent = false;
+            m.opacity = 1.0;
+            m.needsUpdate = true;
+          });
+          obj.castShadow = true;
+        }
+      });
+
+      scene.add(model);
+
+      // Prompt webcam after short delay
+      setTimeout(() => {
+        document.getElementById('webcam-hint').style.display = 'flex';
+      }, 1200);
+    },
+    undefined,
+    err => { console.error('GLB load error:', err); }
+  );
+}
+
+// -- File drop/pick logic -------------------------------------
+const dropArea = document.getElementById('drop-area');
+const fileInput = document.getElementById('file-input');
+
+function handleFile(file) {
+  if (!file || !file.name.match(/\.(glb|gltf)$/i)) return;
+  const url = URL.createObjectURL(file);
+  loadModel(url);
+  document.getElementById('drop-panel').style.display = 'none'; // sluit panel
+}
+
+fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+
+dropArea.addEventListener('dragover', e => { e.preventDefault(); dropArea.classList.add('drag-over'); });
+dropArea.addEventListener('dragleave', () => dropArea.classList.remove('drag-over'));
+dropArea.addEventListener('drop', e => {
+  e.preventDefault(); dropArea.classList.remove('drag-over');
+  handleFile(e.dataTransfer.files[0]);
+});
+
+// Also try loading automatically if served from same folder
+(function tryAutoLoad() {
+  // Attempt fetch to check if file exists alongside HTML
+  fetch('CatAdventurer.glb', { method: 'HEAD' })
+    .then(r => { if (r.ok) loadModel('CatAdventurer.glb'); })
+    .catch(() => { /* show drop zone - already visible */ });
+})();
+
+// -- Webcam face tracking -------------------------------------
+let webcamActive = false;
+let faceData = null;
+
+function loadScript(src) {
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = src; s.onload = res; s.onerror = rej;
+    document.head.appendChild(s);
+  });
+}
+
+async function startWebcam() {
+  document.getElementById('webcam-hint').style.display = 'none';
+  const badge = document.getElementById('tracking-badge');
+  const badgeText = document.getElementById('badge-text');
+
+  // Webcam requires a secure context (https or localhost) - file:// won't work
+  const isSecure = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  if (!isSecure) {
+    badgeText.textContent = 'Mouse Tracking';
+    badge.classList.remove('active');
+    showFallbackNotice('Face tracking needs a local server or HTTPS.\nMouse tracking is active instead. 🐭');
+    return;
+  }
+
+  // Check if camera permission is already denied before even trying
+  try {
+    if (navigator.permissions) {
+      const perm = await navigator.permissions.query({ name: 'camera' });
+      if (perm.state === 'denied') {
+        badgeText.textContent = 'Mouse Tracking';
+        showFallbackNotice('Camera permission was denied.\nMouse tracking is active instead. 🐭');
+        return;
+      }
+    }
+  } catch(_) { /* permissions API not supported, continue */ }
+
+  try {
+    await loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js');
+    await loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js');
+
+    const video = document.createElement('video');
+    video.style.cssText = 'position:fixed;bottom:10px;right:10px;width:1px;height:1px;opacity:0;pointer-events:none;';
+    document.body.appendChild(video);
+
+    // Request camera stream first - catches NotReadableError, NotAllowedError, etc.
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: { width:320, height:240 } });
+    } catch(camErr) {
+      console.warn('Camera unavailable:', camErr.name, camErr.message);
+      badgeText.textContent = 'Mouse Tracking';
+      if (camErr.name !== 'NotAllowedError') {
+        // NotAllowedError = user clicked deny, no need to show notice
+        showFallbackNotice('Camera could not be accessed (' + camErr.name + ').\nMouse tracking is active instead. 🐭');
+      }
+      return;
+    }
+
+    const faceMesh = new FaceMesh({ locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}` });
+    faceMesh.setOptions({ maxNumFaces:1, refineLandmarks:false, minDetectionConfidence:0.5, minTrackingConfidence:0.5 });
+    faceMesh.onResults(results => {
+      if (!results.multiFaceLandmarks?.length) return;
+      const lm = results.multiFaceLandmarks[0];
+      const eyeCX = (lm[33].x + lm[263].x) / 2;
+      const noseTipY = lm[1].y;
+      faceData = {
+        yaw:   THREE.MathUtils.clamp((eyeCX - 0.5) * -2.2, -MY, MY),
+        pitch: THREE.MathUtils.clamp((noseTipY - 0.42) * 1.5, -MX, MX)
+      };
+    });
+
+    video.srcObject = stream;
+    video.play();
+    const cam = new Camera(video, { onFrame: async () => faceMesh.send({ image: video }), width:320, height:240 });
+    cam.start();
+
+    webcamActive = true;
+    badge.classList.add('active');
+    badgeText.textContent = 'Face Tracking Active';
+
+  } catch(err) {
+    console.warn('Face tracking setup failed:', err);
+    badgeText.textContent = 'Mouse Tracking';
+  }
+}
+
+function showFallbackNotice(msg) {
+  const el = document.createElement('div');
+  el.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:300;background:rgba(18,16,14,0.6); border:1px solid var(--border);border-radius:12px;padding:14px 20px;font-size:13px;color:var(--muted);font-family:"Nunito",sans-serif;text-align:center;white-space:pre-line;max-width:360px;line-height:1.6;';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.style.transition = 'opacity .5s', 2500);
+  setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 500); }, 3000);
+}
+
+// -- Resize ---------------------------------------------------
+function onResize() {
+  renderer.setSize(innerWidth, innerHeight);
+  camera3d.aspect = innerWidth / innerHeight;
+  camera3d.updateProjectionMatrix();
+}
+window.addEventListener('resize', onResize);
+onResize();
+
+// -- Render loop ----------------------------------------------
+let t = 0;
+(function animate() {
+  requestAnimationFrame(animate);
+  t += 0.008;
+
+  if (headBone) {
+    if (webcamActive && faceData) {
+      tgt.y = faceData.yaw;
+      tgt.x = faceData.pitch;
+    } else {
+      tgt.y = THREE.MathUtils.clamp(mouseNorm.x * MY, -MY, MY);
+      tgt.x = THREE.MathUtils.clamp(mouseNorm.y * MX * 0.6, -MX, MX);
+    }
+    // Idle sway
+    tgt.y += Math.sin(t * 0.6) * 0.01;
+    tgt.x += Math.sin(t * 0.4) * 0.005;
+    // Smooth
+    cur.x += (tgt.x - cur.x) * 0.07;
+    cur.y += (tgt.y - cur.y) * 0.07;
+    headBone.rotation.x = cur.x;
+    headBone.rotation.y = cur.y;
+  }
+
+  renderer.render(scene, camera3d);
+})();
+
+// Project data
+const projects = {
+  island: {
+    tag: 'Game', tagClass: 'tag-game',
+    title: 'Island Generation',
+    thumbBg: 'linear-gradient(135deg,#1a1230,#2d1b4e)',
+    slides: [
+      { type: 'emoji', content: '🏝️' },
+      { type: 'image', content: 'screenshots/Picture1.png' },
+      { type: 'image',   content: 'screenshots/Picture1.png' },
+    ],
+    desc: 'Procedurally generated islands out in an ocean built in Unity. Every adventure is filled with new and unique islands for you to sail to. The terrain and coastlines are all generated at runtime using noise algorithms.',
+    tech: ['Unity', 'C#', 'Perlin Noise', 'Procedural Gen'],
+    github: '#', demo: '#'
+  },
+  kamo: {
+    tag: 'Game', tagClass: 'tag-game',
+    title: 'Kamo',
+    thumbBg: 'linear-gradient(135deg,#0d2137,#0a3d5c)',
+    slides: [
+      { type: 'emoji', content: '🦆' },
+      { type: 'image', content: 'screenshots/Picture1.png' },
+    ],
+    desc: 'A roguelike tower climber.',
+    tech: ['Unity', 'C#', 'Roguelike', 'Procedural Levels'],
+    github: '#', demo: null
+  },
+  characters: {
+    tag: '3D Art', tagClass: 'tag-art',
+    title: 'Character Series',
+    thumbBg: 'linear-gradient(135deg,#2d0a1e,#4a1030)',
+    slides: [
+      { type: 'emoji', content: '🎨' },
+      { type: 'image', content: 'screenshots/Picture1.png' },
+    ],
+    desc: 'A collection of original 3D characters created in Blender. Each one started from tutorials but evolved into something personal as I picked up more sculpting and texturing theory along the way.',
+    tech: ['Blender', 'Sculpting', 'PBR Texturing', 'Rigging'],
+    github: null, demo: '#'
+  },
+  weapons: {
+    tag: '3D Models', tagClass: 'tag-art',
+    title: 'Weapon Models',
+    thumbBg: 'linear-gradient(135deg,#0a2d1e,#0d4a30)',
+    slides: [
+      { type: 'emoji', content: '🔫' },
+      { type: 'image', content: 'screenshots/Picture1.png' },
+    ],
+    desc: 'Hard-surface weapon models created for a zombie game project. Modeled, UV unwrapped and textured entirely in Blender, then exported into Unity. Totally harmless, I promise 🙏',
+    tech: ['Blender', 'Hard Surface', 'UV Unwrapping', 'Unity'],
+    github: null, demo: null
+  },
+  customer: {
+    tag: 'Tool', tagClass: 'tag-tool',
+    title: 'Customer Manager',
+    thumbBg: 'linear-gradient(135deg,#2d2200,#4a3800)',
+    slides: [
+      { type: 'emoji', content: '📱' },
+      { type: 'image', content: 'screenshots/Picture1.png' },
+    ],
+    desc: 'Built during my first internship — a full WPF desktop application allowing employees to create, save, search and edit customer records. My biggest project at the time and a huge learning experience in professional software development.',
+    tech: ['WPF', 'XAML', 'C#', '.NET', 'SQL'],
+    github: null, demo: null
+  },
+  particles: {
+    tag: '3D Simulation', tagClass: 'tag-art',
+    title: 'Particle Simulation',
+    thumbBg: 'linear-gradient(135deg,#2d2200,#4a3800)',
+    slides: [
+      { type: 'emoji', content: '🐍' },
+      { type: 'image', content: 'screenshots/Picture1.png' },
+    ],
+    desc: 'A wild vortex particle simulation built entirely with Python scripting inside Blender. No keyframes — just math, forces and thousands of particles doing their thing.',
+    tech: ['Blender', 'Python', 'Particle Systems', 'Simulation'],
+    github: '#', demo: '#'
+  }
+};
+
+let currentSlide = 0;
+let totalSlides = 0;
+
+function openModal(id) {
+  const p = projects[id];
+  document.getElementById('modal-tag').textContent = p.tag;
+  document.getElementById('modal-tag').className = 'modal-tag ' + p.tagClass;
+  document.getElementById('modal-title').textContent = p.title;
+  document.getElementById('modal-desc').textContent = p.desc;
+  document.getElementById('modal-chips').innerHTML = p.tech.map(t => `<span class="modal-chip">${t}</span>`).join('');
+
+  const links = [];
+  if (p.github) links.push(`<a href="${p.github}" class="modal-link primary">🐙 GitHub</a>`);
+  if (p.demo)   links.push(`<a href="${p.demo}"   class="modal-link">🚀 Live demo</a>`);
+  if (!links.length) links.push(`<span style="color:var(--muted);font-size:13px;">No links available yet</span>`);
+  document.getElementById('modal-links').innerHTML = links.join('');
+
+  // Build slides
+  const slidesEl = document.getElementById('modal-slides');
+  const dotsEl   = document.getElementById('slide-dots');
+  slidesEl.innerHTML = '';
+  dotsEl.innerHTML = '';
+  document.getElementById('modal-slideshow').style.background = p.thumbBg;
+
+  p.slides.forEach((s, i) => {
+    const slide = document.createElement('div');
+    slide.className = 'slide' + (i === 0 ? ' active' : '');
+    if (s.type === 'emoji') {
+      slide.textContent = s.content;
+    } else if (s.type === 'image' || s.type === 'gif') {
+      const img = document.createElement('img');
+      img.src = s.content; img.alt = '';
+      slide.appendChild(img);
+    } else if (s.type === 'video') {
+      const vid = document.createElement('video');
+      vid.src = s.content; vid.autoplay = true;
+      vid.loop = true; vid.muted = true; vid.playsInline = true;
+      slide.appendChild(vid);
+    }
+    slidesEl.appendChild(slide);
+
+    const dot = document.createElement('div');
+    dot.className = 'slide-dot' + (i === 0 ? ' active' : '');
+    dot.onclick = () => goToSlide(i);
+    dotsEl.appendChild(dot);
+  });
+
+  currentSlide = 0;
+  totalSlides = p.slides.length;
+  updateSlideUI();
+
+  // Hide arrows if only one slide
+  const showNav = totalSlides > 1;
+  document.getElementById('slide-prev').style.display = showNav ? 'flex' : 'none';
+  document.getElementById('slide-next').style.display = showNav ? 'flex' : 'none';
+  document.getElementById('slide-dots').style.display = showNav ? 'flex' : 'none';
+  document.getElementById('slide-counter').style.display = showNav ? 'block' : 'none';
+
+  document.getElementById('project-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function goToSlide(n) {
+  const slides = document.querySelectorAll('#modal-slides .slide');
+  const dots   = document.querySelectorAll('#slide-dots .slide-dot');
+  slides[currentSlide].classList.remove('active');
+  dots[currentSlide].classList.remove('active');
+  currentSlide = (n + totalSlides) % totalSlides;
+  slides[currentSlide].classList.add('active');
+  dots[currentSlide].classList.add('active');
+  updateSlideUI();
+}
+
+function slideNav(dir) { goToSlide(currentSlide + dir); }
+
+function updateSlideUI() {
+  document.getElementById('slide-counter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+}
+function closeModal() {
+  document.getElementById('project-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function handleBackdropClick(e) {
+  if (e.target === e.currentTarget) closeModal();
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+document.getElementById('contact-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('submit-btn');
+  const msg = document.getElementById('form-msg');
+  btn.textContent = '⏳ Sending...';
+  btn.disabled = true;
+
+  const res = await fetch(this.action, {
+    method: 'POST',
+    body: new FormData(this),
+    headers: { 'Accept': 'application/json' }
+  });
+
+  if (res.ok) {
+    msg.textContent = '✅ Message sent! I\'ll get back to you soon.';
+    msg.style.color = 'var(--cyan)';
+    this.reset();
+  } else {
+    msg.textContent = '❌ Something went wrong. Try emailing me directly.';
+    msg.style.color = 'var(--pink)';
+  }
+  msg.style.display = 'block';
+  btn.textContent = '🚀 Send it!';
+  btn.disabled = false;
+});
+</script>
+</body>
+</html>
