@@ -105,6 +105,21 @@ nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; justify
 .btn-outline { background:transparent; color:var(--text); border:2px solid var(--border); }
 .btn-outline:hover { border-color:var(--purple); color:var(--purple); }
 
+.btn-cv {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:13px 26px; border-radius:12px;
+  font-family:'Nunito',sans-serif; font-weight:700; font-size:14px;
+  text-decoration:none; cursor:none;
+  transition:transform .15s, border-color .2s, color .2s, box-shadow .15s;
+  background:transparent; color:var(--cyan); border:2px solid var(--border);
+  letter-spacing:.03em;
+}
+.btn-cv:hover { transform:translateY(-2px); border-color:var(--cyan); box-shadow:0 6px 20px rgba(138,171,154,.15); }
+.btn-cv-icon { padding:13px 18px; } /* icon-only variant — narrower */
+
+/* Divider between button groups */
+.btn-divider { width:1px; height:20px; background:var(--border); margin:0 2px; flex-shrink:0; }
+
 /* Sections */
 section:not(#hero) { padding:100px 48px; border-top:1px solid rgba(255,255,255,0.04); }
 .section-eyebrow { font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--yellow); margin-bottom:12px; }
@@ -191,6 +206,7 @@ section:not(#hero) { padding:100px 48px; border-top:1px solid rgba(255,255,255,0
   transform: translateY(16px) scale(0.97);
   transition: transform .3s cubic-bezier(.16,1,.3,1);
   position: relative;
+  margin-top: 70px;
 }
 .modal-backdrop.open .modal-box { transform: translateY(0) scale(1); }
 .modal-header {
@@ -274,6 +290,17 @@ section:not(#hero) { padding:100px 48px; border-top:1px solid rgba(255,255,255,0
   color: rgba(255,255,255,0.5); z-index: 10;
   background: rgba(15,14,23,0.5); padding: 3px 8px; border-radius: 999px;
   backdrop-filter: blur(4px);
+}
+
+.team-switch-btn {
+  background: rgba(201,168,124,0.08);
+  border-color: rgba(201,168,124,0.35) !important;
+  color: var(--yellow) !important;
+  cursor: none;
+}
+.team-switch-btn:hover {
+  background: rgba(201,168,124,0.16) !important;
+  border-color: var(--yellow) !important;
 }
 
 /* Skills */
@@ -415,14 +442,39 @@ footer { border-top:1px solid rgba(255,255,255,.05); padding:28px 48px; display:
 
 <div class="page">
 
-  <section id="hero">
+    <section id="hero">
     <div class="hero-content">
-      <div class="hero-tag reveal"> Open to adventures</div>
+      <div class="hero-tag reveal">✨ Open to adventures</div>
       <h1 class="hero-title reveal">Hi, I'm<br><span class="hl1">Daniël</span><br><span class="hl2">Freriksen</span></h1>
       <p class="hero-sub reveal">A software developer who <strong>wishes to learn more and more about programming</strong> - from games to interfaces, always with a dash of adventure and a pinch of magic.</p>
+
+      <!-- ✅ Option A: CV buttons after a divider -->
       <div class="hero-btns reveal">
-        <a href="#projects" class="btn btn-primary">See my work</a>
-        <a href="#contact" class="btn btn-outline">Say hello</a>
+        <a href="#projects" class="btn btn-primary">⚡ See my work</a>
+        <a href="#contact" class="btn btn-outline">👋 Say hello</a>
+
+        <div class="btn-divider"></div>
+
+        <!-- View CV — replace # with your actual CV URL, e.g. a hosted PDF or page -->
+        <a href="CV Daniël Freriksen.pdf" target="_blank" class="btn-cv">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+          View CV
+        </a>
+
+        <!-- Download CV — replace # with direct link to your PDF file -->
+        <a href="CV Daniël Freriksen.pdf" download class="btn-cv btn-cv-icon" title="Download CV">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+        </a>
       </div>
     </div>
   </section>
@@ -503,6 +555,63 @@ footer { border-top:1px solid rgba(255,255,255,.05); padding:28px 48px; display:
           <div class="modal-chips" id="modal-chips"></div>
           <div class="modal-section-title">Links</div>
           <div class="modal-links" id="modal-links"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-backdrop" id="team-modal" onclick="handleTeamBackdropClick(event)">
+      <div class="modal-box" style="max-width:560px;">
+        <div class="modal-header">
+          <div>
+            <span class="modal-tag tag-WIP">Game Studio</span>
+            <h2 class="modal-title">justAteam</h2>
+          </div>
+          <button class="modal-close" onclick="closeTeamModal()">✕</button>
+        </div>
+
+        <div style="margin:20px 28px; border-radius:16px; overflow:hidden; height:160px;">
+          <img src="screenshots/JustATeamLogo.jpg" alt="justATeam" style="width:100%; height:100%; object-fit:cover; border-radius:16px; display:block;">
+        </div>
+
+        <div class="modal-body">
+          <p class="modal-desc">
+            justAteam is a small indie game production team building atmospheric and story-driven games. Currently deep in development on <strong>Rustbucket</strong> — a psychological horror experience about a ranger's dark past.
+          </p>
+
+          <div class="modal-section-title">Members</div>
+          <div class="modal-chips">
+            <span class="modal-chip">🎮 Daniël — Unity Developer</span>
+            <span class="modal-chip">🎮 Ruben — Unity Developer</span>
+            <span class="modal-chip">🎮 Darko — Unity Developer</span>
+            <span class="modal-chip">🎮 Rinze — Unity Developer</span>
+            <span class="modal-chip">🎮 Subzero — Unity Developer</span>
+            <span class="modal-chip">✏️ Kaylee — Writer</span>
+            <span class="modal-chip">✏️ Shreklock — Artist</span>
+            <span class="modal-chip">✏️ Sam — 3D Artist</span>
+            <span class="modal-chip">✏️ Lee — 3D Artist</span>
+          </div>
+
+          <div class="modal-section-title">Current project</div>
+          <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px 18px; margin-bottom:24px; display:flex; align-items:center; gap:14px; cursor:none; transition:border-color .2s;"
+            onmouseenter="this.style.borderColor='var(--purple)'"
+            onmouseleave="this.style.borderColor='var(--border)'"
+            onclick="closeTeamModal(); setTimeout(() => openModal('Rustbucket'), 180);">
+            <span style="font-size:28px;">👻</span>
+            <div>
+              <div style="font-family:'Fredoka One',cursive; font-size:17px;">Rustbucket</div>
+              <div style="font-size:13px; color:var(--muted); margin-top:2px;">Psychological horror — WIP</div>
+            </div>
+            <span style="margin-left:auto; color:var(--muted);">→</span>
+          </div>
+
+          <div class="modal-section-title">Links</div>
+          <div class="modal-links">
+            <a href="https://www.instagram.com/justateam_games/" target="_blank" class="modal-link">
+              <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/instagram.svg"
+              style="width:14px;height:14px;filter:invert(1);opacity:0.7;">
+                Instagram
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -881,8 +990,8 @@ const projects = {
     thumbBg: 'linear-gradient(135deg,#1a1230,#2d1b4e)',
     slides: [
       { type: 'emoji', content: '🏝️' },
-      { type: 'image', content: 'screenshots/Picture1.png' },
-      { type: 'image',   content: 'screenshots/Picture1.png' },
+      { type: 'video', content: 'screenshots/PG.mp4' },
+      { type: 'image',   content: 'screenshots/PGEiland.png' },
     ],
     desc: 'Procedurally generated islands out in an ocean built in Unity. Every adventure is filled with new and unique islands for you to sail to. The terrain and coastlines are all generated at runtime using noise algorithms.',
     tech: ['Unity', 'C#', 'Perlin Noise', 'Procedural Gen'],
@@ -894,9 +1003,9 @@ const projects = {
     thumbBg: 'linear-gradient(135deg,#0d2137,#0a3d5c)',
     slides: [
       { type: 'emoji', content: '🦆' },
-      { type: 'image', content: 'screenshots/Picture1.png' },
+      { type: 'image', content: 'screenshots/KamoGame.png' },
     ],
-    desc: 'A roguelike tower climber',
+    desc: 'A roguelike tower climber where you play as kamo, a samurai duck with a huge shotgun.',
     tech: ['Unity', 'C#', 'Roguelike', 'Procedural Levels'],
     github: 'https://github.com/Roc-LuukvanNorden/Kamo_J2P2_ProjectFreedom', demo: 'https://play.unity.com/en/games/26f5a560-8886-4f65-88a8-181877ededde/kamo'
   },
@@ -909,8 +1018,9 @@ const projects = {
       { type: 'image', content: 'screenshots/rustbucket.png' },
     ],
     desc: 'A psycholigical horror game where you are playing as Eric. Eric starts a new life as a ranger.',
-    tech: ['Unity', 'C#', 'Roguelike', 'Procedural Levels'],
-    github: null, demo: null
+    tech: ['Unity', 'C#', 'Horror', 'Story'],
+    github: null, demo: null,
+    team: { name: 'justAteam', modal: 'team' }
   },
   characters: {
     tag: '3D Art', tagClass: 'tag-art',
@@ -932,7 +1042,10 @@ const projects = {
     thumbBg: 'linear-gradient(135deg,#2d2200,#4a3800)',
     slides: [
       { type: 'emoji', content: '📱' },
-      { type: 'image', content: 'screenshots/Picture1.png' },
+      { type: 'image', content: 'screenshots/FrontPage.png' },
+      { type: 'image', content: 'screenshots/ErrorChecking.png' },
+      { type: 'image', content: 'screenshots/CustomerInfo.png' },
+      { type: 'image', content: 'screenshots/Tasks.png' },
     ],
     desc: 'Built during my first internship — a full WPF desktop application allowing employees to create, save, search and edit customer records. My biggest project at the time and a huge learning experience in professional software development.',
     tech: ['WPF', 'XAML', 'C#', '.NET', 'SQL'],
@@ -944,12 +1057,14 @@ const projects = {
     thumbBg: 'linear-gradient(135deg,#2d2200,#4a3800)',
     slides: [
       { type: 'emoji', content: '🐍' },
+      { type: 'image', content: 'screenshots/Blender.png' },
       { type: 'video', content: 'screenshots/0001-0600.mkv' },
     ],
     desc: 'A wild vortex particle simulation built entirely with Python scripting inside Blender. No keyframes — just math, forces and thousands of particles doing their thing.',
     tech: ['Blender', 'Python', 'Particle Systems', 'Simulation'],
-    github: '#', demo: null
-  }
+    github: null, demo: null
+  },
+
 };
 
 let currentSlide = 0;
@@ -966,6 +1081,12 @@ function openModal(id) {
   const links = [];
   if (p.github) links.push(`<a href="${p.github}" class="modal-link primary">🐙 GitHub</a>`);
   if (p.demo)   links.push(`<a href="${p.demo}"   class="modal-link">🚀 Live demo</a>`);
+  if (p.team)   links.push(`
+  <button class="modal-link team-switch-btn" onclick="closeModal(); setTimeout(() => openTeamModal(), 180)">
+    <img src="screenshots/JustATeam.jpg" alt="justATeam" style="width:18px;height:18px;border-radius:4px;object-fit:cover;flex-shrink:0;">
+    Made by ${p.team.name}
+  </button>
+`);
   if (!links.length) links.push(`<span style="color:var(--muted);font-size:13px;">No links available yet</span>`);
   document.getElementById('modal-links').innerHTML = links.join('');
 
@@ -1014,7 +1135,17 @@ function openModal(id) {
   document.getElementById('project-modal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
-
+function openTeamModal() {
+  document.getElementById('team-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeTeamModal() {
+  document.getElementById('team-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function handleTeamBackdropClick(e) {
+  if (e.target === e.currentTarget) closeTeamModal();
+}
 function goToSlide(n) {
   const slides = document.querySelectorAll('#modal-slides .slide');
   const dots   = document.querySelectorAll('#slide-dots .slide-dot');
@@ -1040,7 +1171,7 @@ function handleBackdropClick(e) {
   if (e.target === e.currentTarget) closeModal();
 }
 
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); closeTeamModal(); });
 
 document.getElementById('contact-form').addEventListener('submit', async function(e) {
   e.preventDefault();
