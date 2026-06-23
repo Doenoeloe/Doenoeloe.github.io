@@ -518,6 +518,10 @@ footer { border-top:1px solid rgba(255,255,255,.05); padding:28px 48px; display:
         <div class="project-thumb" style="background:linear-gradient(135deg,#000000,#000000)">👻</div>
         <div class="project-body"><span class="project-tag tag-WIP">WIP</span><div class="project-name">Rustbucket</div><div class="project-desc"> psycholigical horror game, about a rangers dark past - Made by justAteam</div></div>
       </div>
+      <div class="project-card" onclick="openModal('MOVE')">
+        <div class="project-thumb" style="background:linear-gradient(135deg,#000000,#000000)">⚔️</div>
+        <div class="project-body"><span class="project-tag tag-game">WIP</span><div class="project-name">MOVE</div><div class="project-desc"> A cool beat em up where you fight as 3 characters at once. Defeat hordes of enemies and get stronger for the big fights.</div></div>
+      </div>
       <div class="project-card" onclick="openModal('characters')">
         <div class="project-thumb" style="background:linear-gradient(135deg,#000000,#000000)">🎨</div>
         <div class="project-body"><span class="project-tag tag-art">3D Art</span><div class="project-name">Character Series</div><div class="project-desc">Characters created from tutorials and theory picked up along the way.</div></div>
@@ -1018,11 +1022,25 @@ const projects = {
     slides: [
       { type: 'emoji', content: '👻' },
       { type: 'image', content: 'screenshots/rustbucket.png' },
+      { type: 'video', content: 'screenshots/HaikuDemo.mp4' },
     ],
-    desc: 'A psycholigical horror game where you are playing as Eric. Eric starts a new life as a ranger.',
+    desc: 'A psycholigical horror game where you are playing as Eric. Eric starts a new life as a ranger to run away from a horrid past. Will he overcome his past or will he be swallowed by his past',
     tech: ['Unity', 'C#', 'Horror', 'Story'],
     github: null, demo: null,
     team: { name: 'justAteam', modal: 'team' }
+  },
+  MOVE: {
+    tag: 'WIP', tagClass: 'tag-WIP',
+    title: 'MOVE',
+    thumbBg: 'linear-gradient(135deg,#2d2200,#4a3800)',
+    slides: [
+      { type: 'emoji', content: '⚔️' },
+      { type: 'video', content: 'screenshots/MOVE.mp4' },
+      { type: 'video', content: 'screenshots/WallRun.mp4' },
+    ],
+    desc: 'MOVE is a Beat em up where you fight as 3 different characters at once to beat waves and to become gradually stronger. MOVE will contain much movement and combat to make a really clean experience. Currently a work in progress.',
+    tech: ['Unity', 'C#'],
+    github: null, demo: null
   },
   characters: {
     tag: '3D Art', tagClass: 'tag-art',
